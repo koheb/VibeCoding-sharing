@@ -1,0 +1,585 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mood of the Day - Singapore Students</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        @import url('https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600;700&family=Playpen+Sans:wght@400;700&display=swap');
+
+        body {
+            font-family: 'Fredoka', sans-serif;
+            background: linear-gradient(135deg, #0f0c29 0%, #1a0a3e 25%, #16213e 50%, #0a1929 75%, #000814 100%);
+            background-size: 400% 400%;
+            animation: gradientShift 15s ease infinite;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            color: #e0e0e0;
+        }
+
+        @keyframes gradientShift {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        .container {
+            background: rgba(20, 20, 35, 0.95);
+            border-radius: 30px;
+            padding: 40px 30px;
+            max-width: 500px;
+            width: 100%;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.7), 0 0 40px rgba(100, 200, 255, 0.1);
+            backdrop-filter: blur(10px);
+            animation: slideIn 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
+            border: 1px solid rgba(100, 150, 255, 0.2);
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        .header h1 {
+            font-family: 'Playpen Sans', cursive;
+            font-size: 2.5em;
+            background: linear-gradient(135deg, #667eea, #764ba2, #f093fb);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            font-weight: 700;
+            margin-bottom: 10px;
+            letter-spacing: -1px;
+        }
+
+        .header p {
+            font-size: 1em;
+            color: #a0a0c0;
+            font-weight: 500;
+        }
+
+        .moods-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-bottom: 30px;
+        }
+
+        .mood-btn {
+            aspect-ratio: 1;
+            border: none;
+            border-radius: 20px;
+            font-size: 2.5em;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+            gap: 5px;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+            font-family: 'Playpen Sans', cursive;
+            font-size: 1.1em;
+        }
+
+        .mood-btn::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: radial-gradient(circle at center, rgba(255,255,255,0.3) 0%, transparent 70%);
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+
+        .mood-btn:hover {
+            transform: translateY(-8px) scale(1.05);
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.25);
+        }
+
+        .mood-btn:hover::before {
+            opacity: 1;
+        }
+
+        .mood-btn:active {
+            transform: translateY(-3px) scale(1.02);
+        }
+
+        .emoji {
+            font-size: 2.8em;
+            display: block;
+            line-height: 1;
+        }
+
+        .mood-btn.sianz {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+        }
+
+        .mood-btn.sianhalf {
+            background: linear-gradient(135deg, #f093fb, #f5576c);
+            color: white;
+        }
+
+        .mood-btn.ded {
+            background: linear-gradient(135deg, #4facfe, #00f2fe);
+            color: white;
+        }
+
+        .mood-btn.shiok {
+            background: linear-gradient(135deg, #fa709a, #fee140);
+            color: white;
+        }
+
+        .mood-btn.wahlao {
+            background: linear-gradient(135deg, #30cfd0, #330867);
+            color: white;
+        }
+
+        .response-box {
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            border-radius: 20px;
+            padding: 25px;
+            margin-top: 20px;
+            min-height: 100px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            opacity: 0;
+            transform: translateY(20px);
+            transition: all 0.4s ease;
+            pointer-events: none;
+            border: 1px solid rgba(100, 150, 255, 0.2);
+        }
+
+        .response-box:hover {
+            box-shadow: 0 0 30px rgba(100, 150, 255, 0.5), 0 0 60px rgba(150, 100, 255, 0.3), inset 0 0 20px rgba(100, 150, 255, 0.1);
+            border-color: rgba(100, 150, 255, 0.6);
+        }
+
+        .response-box.show {
+            opacity: 1;
+            transform: translateY(0);
+            pointer-events: auto;
+        }
+
+        .response-box.sianz-response {
+            background: linear-gradient(135deg, #2d1b4e, #3d2670);
+            color: #e0e0ff;
+            border-color: rgba(150, 100, 200, 0.4);
+        }
+
+        .response-box.sianz-response:hover {
+            box-shadow: 0 0 30px rgba(150, 100, 200, 0.6), 0 0 60px rgba(150, 100, 200, 0.3), inset 0 0 20px rgba(150, 100, 200, 0.15);
+        }
+
+        .response-box.sianhalf-response {
+            background: linear-gradient(135deg, #4d1f3e, #6d2f5e);
+            color: #ffe0e8;
+            border-color: rgba(200, 100, 150, 0.4);
+        }
+
+        .response-box.sianhalf-response:hover {
+            box-shadow: 0 0 30px rgba(200, 100, 150, 0.6), 0 0 60px rgba(200, 100, 150, 0.3), inset 0 0 20px rgba(200, 100, 150, 0.15);
+        }
+
+        .response-box.ded-response {
+            background: linear-gradient(135deg, #1a3a4d, #2a5a7d);
+            color: #a0e7ff;
+            border-color: rgba(100, 180, 220, 0.4);
+        }
+
+        .response-box.ded-response:hover {
+            box-shadow: 0 0 30px rgba(100, 180, 220, 0.6), 0 0 60px rgba(100, 180, 220, 0.3), inset 0 0 20px rgba(100, 180, 220, 0.15);
+        }
+
+        .response-box.shiok-response {
+            background: linear-gradient(135deg, #4d3a1a, #6d5a2a);
+            color: #ffe8a0;
+            border-color: rgba(220, 150, 100, 0.4);
+        }
+
+        .response-box.shiok-response:hover {
+            box-shadow: 0 0 30px rgba(220, 150, 100, 0.6), 0 0 60px rgba(220, 150, 100, 0.3), inset 0 0 20px rgba(220, 150, 100, 0.15);
+        }
+
+        .response-box.wahlao-response {
+            background: linear-gradient(135deg, #1a4d4d, #2a7d7d);
+            color: #a0ffff;
+            border-color: rgba(100, 220, 220, 0.4);
+        }
+
+        .response-box.wahlao-response:hover {
+            box-shadow: 0 0 30px rgba(100, 220, 220, 0.6), 0 0 60px rgba(100, 220, 220, 0.3), inset 0 0 20px rgba(100, 220, 220, 0.15);
+        }
+
+        .response-text {
+            font-size: 1.3em;
+            font-weight: 600;
+            line-height: 1.5;
+            letter-spacing: 0.3px;
+        }
+
+        .emoji-response {
+            font-size: 2em;
+            margin-bottom: 8px;
+        }
+
+        .random-emoji-box {
+            background: linear-gradient(135deg, #2a1a4d, #4d2d7d);
+            border-radius: 20px;
+            padding: 20px;
+            margin-top: 20px;
+            min-height: 80px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: 2px solid rgba(150, 100, 200, 0.3);
+            transition: all 0.3s ease;
+            animation: subtleGlow 3s ease-in-out infinite;
+        }
+
+        @keyframes subtleGlow {
+            0%, 100% {
+                box-shadow: 0 0 20px rgba(150, 100, 200, 0.3), inset 0 0 15px rgba(150, 100, 200, 0.1);
+            }
+            50% {
+                box-shadow: 0 0 30px rgba(150, 100, 200, 0.5), inset 0 0 20px rgba(150, 100, 200, 0.15);
+            }
+        }
+
+        .random-emoji-box:hover {
+            transform: scale(1.05);
+            box-shadow: 0 0 40px rgba(150, 100, 200, 0.7), inset 0 0 25px rgba(150, 100, 200, 0.2);
+            border-color: rgba(150, 100, 200, 0.6);
+        }
+
+        .random-emoji {
+            font-size: 3.5em;
+            display: inline-block;
+            animation: randomEmojiBounce 2s ease-in-out infinite;
+        }
+
+        @keyframes randomEmojiBounce {
+            0%, 100% {
+                transform: translateY(0) rotate(0deg);
+            }
+            25% {
+                transform: translateY(-10px) rotate(5deg);
+            }
+            75% {
+                transform: translateY(-10px) rotate(-5deg);
+            }
+        }
+
+        .mood-label {
+            font-size: 0.75em;
+            font-weight: 600;
+            margin-top: 3px;
+        }
+
+        .mood-counter {
+            position: absolute;
+            top: 8px;
+            right: 8px;
+            background: rgba(0, 0, 0, 0.5);
+            color: #fff;
+            border-radius: 50%;
+            width: 28px;
+            height: 28px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.8em;
+            font-weight: 700;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            transition: all 0.2s ease;
+        }
+
+        .mood-btn:hover .mood-counter {
+            background: rgba(255, 255, 255, 0.2);
+            border-color: rgba(255, 255, 255, 0.6);
+            transform: scale(1.15);
+        }
+
+        @media (max-width: 600px) {
+            .container {
+                padding: 30px 20px;
+                border-radius: 25px;
+            }
+
+            .header h1 {
+                font-size: 2em;
+            }
+
+            .moods-grid {
+                gap: 12px;
+            }
+
+            .mood-btn {
+                border-radius: 15px;
+            }
+
+            .response-box {
+                border-radius: 15px;
+                padding: 20px;
+            }
+
+            .response-text {
+                font-size: 1.1em;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .moods-grid {
+                grid-template-columns: 1fr;
+                gap: 10px;
+            }
+
+            .mood-btn {
+                aspect-ratio: auto;
+                padding: 20px;
+                flex-direction: row;
+                gap: 15px;
+                border-radius: 12px;
+            }
+
+            .emoji {
+                font-size: 2.2em;
+            }
+
+            .mood-label {
+                font-size: 0.9em;
+            }
+
+            .header h1 {
+                font-size: 1.7em;
+            }
+
+            .header p {
+                font-size: 0.9em;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>😎 Mood of the Day</h1>
+            <p>What's your vibe today, bro?</p>
+        </div>
+
+        <div class="moods-grid">
+            <button class="mood-btn sianz" data-mood="sianz">
+                <span class="mood-counter">0</span>
+                <span class="emoji">😴</span>
+                <span class="mood-label">Sianz</span>
+            </button>
+            <button class="mood-btn sianhalf" data-mood="sianhalf">
+                <span class="mood-counter">0</span>
+                <span class="emoji">😤</span>
+                <span class="mood-label">Sian Half</span>
+            </button>
+            <button class="mood-btn ded" data-mood="ded">
+                <span class="mood-counter">0</span>
+                <span class="emoji">💀</span>
+                <span class="mood-label">Ded</span>
+            </button>
+            <button class="mood-btn shiok" data-mood="shiok">
+                <span class="mood-counter">0</span>
+                <span class="emoji">🔥</span>
+                <span class="mood-label">Shiok</span>
+            </button>
+        </div>
+
+        <div class="moods-grid" style="grid-template-columns: 1fr; margin-bottom: 0;">
+            <button class="mood-btn wahlao" data-mood="wahlao">
+                <span class="mood-counter">0</span>
+                <span class="emoji">😂</span>
+                <span class="mood-label">Wah Lao</span>
+            </button>
+        </div>
+
+        <div class="response-box" id="responseBox">
+            <div class="emoji-response" id="responseEmoji"></div>
+            <div class="response-text" id="responseText"></div>
+        </div>
+
+        <div class="random-emoji-box" id="randomEmojiBox">
+            <span class="random-emoji" id="randomEmoji">🎲</span>
+        </div>
+    </div>
+
+    <script>
+        const responses = {
+            sianz: [
+                { emoji: '📚', text: 'Sianz lor... Got Maths test next week. Differentiation and integration also siao already.' },
+                { emoji: '😑', text: 'So tired leh. Chemistry equations, Higher Chinese essays — brain dead alr.' },
+                { emoji: '💀', text: 'Sianz max. Physics concepts also don\'t make sense, just memorize pray pray lor.' }
+            ],
+            sianhalf: [
+                { emoji: '😒', text: 'Sian half lor! Literature essays so hard to write, tuition teacher also confused.' },
+                { emoji: '😮‍💨', text: 'Not so bad lah, but Econs and Physics combined kill me lor. So much to understand.' },
+                { emoji: '🙃', text: 'School okay okay, but homework so much one. English essay, Maths problem set, everything also due.' }
+            ],
+            ded: [
+                { emoji: '⚰️', text: 'Dead lah bro. Chemistry practical exam coming, haven\'t even memorize the procedures yet lor.' },
+                { emoji: '💀', text: 'Finished bro/sis. Maths tuition yesterday kena scolded for not doing homework. RIP motivation.' },
+                { emoji: '🪦', text: 'Completely ded. Physics practical, Maths mid-year, Higher Chinese composition — all coming one by one.' }
+            ],
+            shiok: [
+                { emoji: '🤩', text: 'Shiok lor! Today free period, can sleep in class. Teacher absent some more! Life is shiok!' },
+                { emoji: '😍', text: 'Shiok max! Got A for Maths test I thought I fail. Teacher also shocked HAHA!' },
+                { emoji: '🎉', text: 'Shiok sia! Chemistry practical exam went well, didn\'t kena deducted for careless mistakes!' }
+            ],
+            wahlao: [
+                { emoji: '🤦', text: 'Wah lao eh! Maths teacher suddenly spring surprise test on us. Nobody ready lah!' },
+                { emoji: '😲', text: 'Wah lao wei! Physics homework got 20 questions one lor. Then got Econs project also due same day!' },
+                { emoji: '🙈', text: 'Wah lao, my results came back wrong on the system. Thought I fail, actually just testing error only!' }
+            ]
+        };
+
+        // Counter tracking
+        const counters = {
+            sianz: 0,
+            sianhalf: 0,
+            ded: 0,
+            shiok: 0,
+            wahlao: 0
+        };
+
+        // Load counters from localStorage
+        function loadCounters() {
+            const saved = localStorage.getItem('moodCounters');
+            if (saved) {
+                Object.assign(counters, JSON.parse(saved));
+                updateAllCounterDisplays();
+            }
+        }
+
+        // Save counters to localStorage
+        function saveCounters() {
+            localStorage.setItem('moodCounters', JSON.stringify(counters));
+        }
+
+        // Update counter display for a specific mood
+        function updateCounterDisplay(mood) {
+            const btn = document.querySelector(`[data-mood="${mood}"]`);
+            const counterElement = btn.querySelector('.mood-counter');
+            counterElement.textContent = counters[mood];
+        }
+
+        // Update all counter displays
+        function updateAllCounterDisplays() {
+            Object.keys(counters).forEach(mood => updateCounterDisplay(mood));
+        }
+
+        function getRandomResponse(mood) {
+            const moodResponses = responses[mood];
+            return moodResponses[Math.floor(Math.random() * moodResponses.length)];
+        }
+
+        // Array of random emojis
+        const randomEmojis = [
+            '🎲', '🎯', '🎪', '🎨', '🎭', '🎬', '🎤', '🎧', '🎮', '🎳',
+            '⚽', '🏀', '🏈', '⚾', '🎾', '🏐', '🏒', '🏑', '🥊', '🥋',
+            '🍕', '🍔', '🍟', '🌭', '🍿', '🥤', '🍺', '🍻', '🍷', '🍰',
+            '🚀', '🛸', '🚁', '✈️', '🚂', '🚃', '🚄', '🚅', '🚆', '🚇',
+            '😀', '😁', '😂', '😃', '😄', '😅', '😆', '😇', '😈', '😉',
+            '🌟', '⭐', '✨', '🌠', '💫', '🌌', '🌃', '🌆', '🌇', '🌉',
+            '👻', '👽', '🤖', '🎃', '🎨', '🎭', '🎪', '🎬', '📚', '📖',
+            '🏆', '🥇', '🥈', '🥉', '🎖️', '🏅', '⚡', '🔥', '❄️', '💧',
+            '🌸', '🌺', '🌻', '🌼', '🌷', '🌹', '🥀', '🌱', '🌿', '☘️',
+            '🦁', '🐯', '🐻', '🐼', '🐨', '🐭', '🐹', '🐰', '🦊', '🐶'
+        ];
+
+        function getRandomEmoji() {
+            return randomEmojis[Math.floor(Math.random() * randomEmojis.length)];
+        }
+
+        function updateRandomEmoji() {
+            const randomEmojiElement = document.getElementById('randomEmoji');
+            randomEmojiElement.style.animation = 'none';
+            setTimeout(() => {
+                randomEmojiElement.textContent = getRandomEmoji();
+                randomEmojiElement.style.animation = 'randomEmojiBounce 2s ease-in-out infinite';
+            }, 10);
+        }
+
+        function showResponse(mood) {
+            const responseBox = document.getElementById('responseBox');
+            const responseEmoji = document.getElementById('responseEmoji');
+            const responseText = document.getElementById('responseText');
+            
+            // Increment counter
+            counters[mood]++;
+            updateCounterDisplay(mood);
+            saveCounters();
+            
+            // Update random emoji
+            updateRandomEmoji();
+            
+            // Remove all response classes
+            responseBox.className = 'response-box';
+            
+            // Add the appropriate class
+            responseBox.classList.add(`${mood}-response`);
+            
+            // Get random response
+            const response = getRandomResponse(mood);
+            
+            // Animate out and back in
+            responseBox.classList.remove('show');
+            
+            setTimeout(() => {
+                responseEmoji.textContent = response.emoji;
+                responseText.textContent = response.text;
+                responseBox.classList.add('show');
+            }, 150);
+        }
+
+        // Add event listeners to all mood buttons
+        document.querySelectorAll('.mood-btn').forEach(btn => {
+            btn.addEventListener('click', function() {
+                const mood = this.getAttribute('data-mood');
+                showResponse(mood);
+            });
+        });
+
+        // Show a random mood response on page load
+        window.addEventListener('load', () => {
+            loadCounters();
+            updateRandomEmoji();
+            setTimeout(() => {
+                const moods = ['sianz', 'sianhalf', 'ded', 'shiok', 'wahlao'];
+                const randomMood = moods[Math.floor(Math.random() * moods.length)];
+                showResponse(randomMood);
+            }, 600);
+        });
+    </script>
+</body>
+</html>
