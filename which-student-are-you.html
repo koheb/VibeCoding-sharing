@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Which Singapore Student Are You?</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'Trebuchet MS', 'Segoe UI', sans-serif;
+    background: linear-gradient(135deg, #0f0c29, #1a0a3e, #16213e);
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 16px;
+    color: #e8e8f5;
+  }
+
+  .card {
+    background: rgba(20, 20, 35, 0.95);
+    border: 1px solid rgba(100, 150, 255, 0.25);
+    border-radius: 28px;
+    padding: 32px 24px;
+    width: 100%;
+    max-width: 520px;
+    box-shadow: 0 0 40px rgba(100, 150, 255, 0.15);
+    text-align: center;
+  }
+
+  h1 { font-size: 1.9em; color: #64d5ff; margin-bottom: 10px; }
+  .sub { color: #a0a0c0; margin-bottom: 24px; line-height: 1.5; }
+  .big-emoji { font-size: 4em; margin: 10px 0 20px; }
+
+  .progress { height: 8px; background: #2a2a45; border-radius: 99px; margin-bottom: 8px; overflow: hidden; }
+  .progress-fill { height: 100%; width: 0; background: linear-gradient(90deg, #64d5ff, #f093fb); transition: width 0.4s ease; }
+  .q-count { font-size: 0.85em; color: #a0a0c0; margin-bottom: 18px; }
+
+  .question { font-size: 1.3em; font-weight: 700; margin-bottom: 20px; line-height: 1.4; }
+
+  .option, .main-btn {
+    display: block;
+    width: 100%;
+    padding: 16px;
+    margin-bottom: 12px;
+    border: 2px solid rgba(100, 150, 255, 0.35);
+    background: #1c1c36;
+    color: #e8e8f5;
+    font-size: 1.05em;
+    border-radius: 16px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    font-family: inherit;
+    text-align: left;
+  }
+  .option:hover {
+    border-color: #64d5ff;
+    box-shadow: 0 0 20px rgba(100, 213, 255, 0.45);
+    transform: translateY(-2px);
+  }
+  .main-btn {
+    text-align: center;
+    background: linear-gradient(135deg, #667eea, #f093fb);
+    border: none;
+    color: #fff;
+    font-weight: 700;
+    font-size: 1.2em;
+  }
+  .main-btn:hover { box-shadow: 0 0 25px rgba(240, 147, 251, 0.6); transform: scale(1.03); }
+
+  .result-title { font-size: 1.7em; color: #f093fb; margin-bottom: 12px; }
+  .result-desc { font-size: 1.1em; line-height: 1.6; margin-bottom: 18px; }
+  .tip {
+    background: rgba(100, 213, 255, 0.1);
+    border-left: 4px solid #64d5ff;
+    padding: 12px 16px;
+    border-radius: 8px;
+    text-align: left;
+    margin-bottom: 22px;
+    line-height: 1.5;
+  }
+
+  .bars { text-align: left; margin-bottom: 22px; }
+  .bar-row { margin-bottom: 10px; font-size: 0.9em; }
+  .bar-track { height: 10px; background: #2a2a45; border-radius: 99px; margin-top: 4px; overflow: hidden; }
+  .bar-fill { height: 100%; background: linear-gradient(90deg, #64d5ff, #f093fb); border-radius: 99px; transition: width 0.8s ease; }
+
+  .hidden { display: none; }
+</style>
+</head>
+<body>
+<div class="card">
+
+  <!-- START SCREEN -->
+  <div id="startScreen">
+    <div class="big-emoji">🎒</div>
+    <h1>Which Singapore Student Are You?</h1>
+    <p class="sub">5 questions. No lying. Find out what kind of student you really are.</p>
+    <button class="main-btn" id="startBtn">Start lor! 🚀</button>
+  </div>
+
+  <!-- QUESTION SCREEN -->
+  <div id="quizScreen" class="hidden">
+    <div class="progress"><div class="progress-fill" id="progressFill"></div></div>
+    <div class="q-count" id="qCount"></div>
+    <div class="question" id="questionText"></div>
+    <div id="options"></div>
+  </div>
+
+  <!-- RESULT SCREEN -->
+  <div id="resultScreen" class="hidden">
+    <div class="big-emoji" id="resultEmoji"></div>
+    <div class="result-title" id="resultTitle"></div>
+    <div class="result-desc" id="resultDesc"></div>
+    <div class="tip" id="resultTip"></div>
+    <div class="bars" id="bars"></div>
+    <button class="main-btn" id="retryBtn">Try again 🔄</button>
+  </div>
+
+</div>
+
+<script>
+  // ---- THE FOUR STUDENT TYPES ----
+  const types = {
+    kiasu: {
+      emoji: '📚',
+      title: 'The Kiasu Overachiever',
+      desc: 'You colour-code your notes, start revising 3 weeks early, and still say "I didn\'t study leh" after the test. Everyone hates you a little, but they all copy your notes.',
+      tip: 'Tip: Sleep also counts as studying. Your brain cannot download lessons while you are on your 4th highlighter.'
+    },
+    lastminute: {
+      emoji: '⏰',
+      title: 'The Last-Minute Legend',
+      desc: 'Your best work happens at 11:59pm. You have a gift: panic turns into focus. Somehow you always pass, and your teacher cannot figure out how.',
+      tip: 'Tip: One day, the wifi will die at 11:58pm. Start earlier. Just once. For science.'
+    },
+    chill: {
+      emoji: '😴',
+      title: 'The Sian Sleeper',
+      desc: 'You can sleep anywhere: in class, on the MRT, standing up. You say "later" a lot. You are not lazy, you are just saving energy for something big. Maybe.',
+      tip: 'Tip: Set 3 alarms. Then put your phone across the room. Yes, really.'
+    },
+    social: {
+      emoji: '🗣️',
+      title: 'The Canteen Strategist',
+      desc: 'You know every teacher\'s mood, which stall has no queue, and who is dating who. Your group chat has 47 unread messages. If gossip was a subject, you would score A1.',
+      tip: 'Tip: Use your powers for good. Organise the study group. Everyone will say you are the real MVP.'
+    }
+  };
+
+  // ---- THE QUESTIONS (each answer adds a point to one type) ----
+  const questions = [
+    {
+      q: "It's 10pm. Big test tomorrow. What are you doing?",
+      options: [
+        { text: "Doing my 3rd round of revision 📖", type: 'kiasu' },
+        { text: "Just opening the textbook now 😬", type: 'lastminute' },
+        { text: "Already sleeping. Whatever happens, happens 😴", type: 'chill' },
+        { text: "In the group chat asking 'which chapters ah?' 📱", type: 'social' }
+      ]
+    },
+    {
+      q: "Teacher announces a group project. Your reaction?",
+      options: [
+        { text: "Create the Google Doc and assign roles immediately 📝", type: 'kiasu' },
+        { text: "Plan to start the night before the deadline 🔥", type: 'lastminute' },
+        { text: "Pray my group members are hardworking 🙏", type: 'chill' },
+        { text: "Make sure I'm grouped with my besties 👯", type: 'social' }
+      ]
+    },
+    {
+      q: "Recess time. The canteen queue is SO long. You...",
+      options: [
+        { text: "Already pre-planned the fastest stall 🗺️", type: 'kiasu' },
+        { text: "Queue and finish my homework at the same time ✍️", type: 'lastminute' },
+        { text: "Skip food and go back to class to sleep 💤", type: 'chill' },
+        { text: "Chat with the whole queue like we're old friends 😎", type: 'social' }
+      ]
+    },
+    {
+      q: "Teacher hands back your test paper. You...",
+      options: [
+        { text: "Check every mark and ask about the 0.5 mark 🔍", type: 'kiasu' },
+        { text: "Flip it over and pray first 😰", type: 'lastminute' },
+        { text: "Look at the score, shrug, put it in the bag 🤷", type: 'chill' },
+        { text: "Look at my friend's score before my own 👀", type: 'social' }
+      ]
+    },
+    {
+      q: "Your perfect free weekend looks like...",
+      options: [
+        { text: "Revision, then more revision (and a little tuition) 🤓", type: 'kiasu' },
+        { text: "Rush all the work I ignored all week 🏃", type: 'lastminute' },
+        { text: "Bed. Snacks. Bed. 🛏️", type: 'chill' },
+        { text: "Mall, bubble tea, and endless chatting 🧋", type: 'social' }
+      ]
+    }
+  ];
+
+  let current = 0;
+  let scores = {};
+
+  const $ = id => document.getElementById(id);
+
+  // Returns a shuffled copy of a list (the original list is not changed)
+  function shuffle(list) {
+    const copy = list.slice();
+    for (let i = copy.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [copy[i], copy[j]] = [copy[j], copy[i]];
+    }
+    return copy;
+  }
+
+  function show(screenId) {
+    ['startScreen', 'quizScreen', 'resultScreen'].forEach(id => $(id).classList.add('hidden'));
+    $(screenId).classList.remove('hidden');
+  }
+
+  function startQuiz() {
+    current = 0;
+    scores = { kiasu: 0, lastminute: 0, chill: 0, social: 0 };
+    show('quizScreen');
+    showQuestion();
+  }
+
+  function showQuestion() {
+    const q = questions[current];
+    $('qCount').textContent = 'Question ' + (current + 1) + ' of ' + questions.length;
+    $('progressFill').style.width = (current / questions.length * 100) + '%';
+    $('questionText').textContent = q.q;
+    $('options').innerHTML = '';
+    shuffle(q.options).forEach(opt => {
+      const btn = document.createElement('button');
+      btn.className = 'option';
+      btn.textContent = opt.text;
+      btn.addEventListener('click', () => chooseAnswer(opt.type));
+      $('options').appendChild(btn);
+    });
+  }
+
+  function chooseAnswer(type) {
+    scores[type]++;
+    current++;
+    if (current < questions.length) {
+      showQuestion();
+    } else {
+      showResult();
+    }
+  }
+
+  function showResult() {
+    // find the type with the highest score
+    const top = Math.max(...Object.values(scores));
+    const tied = Object.keys(scores).filter(t => scores[t] === top);
+    const winner = shuffle(tied)[0];
+    const r = types[winner];
+
+    $('resultEmoji').textContent = r.emoji;
+    $('resultTitle').textContent = r.title;
+    $('resultDesc').textContent = r.desc;
+    $('resultTip').textContent = r.tip;
+
+    $('bars').innerHTML = '';
+    Object.keys(types).forEach(t => {
+      const pct = Math.round(scores[t] / questions.length * 100);
+      const row = document.createElement('div');
+      row.className = 'bar-row';
+      row.innerHTML = types[t].emoji + ' ' + types[t].title +
+        ' (' + pct + '%)<div class="bar-track"><div class="bar-fill" style="width:0"></div></div>';
+      $('bars').appendChild(row);
+      setTimeout(() => { row.querySelector('.bar-fill').style.width = pct + '%'; }, 100);
+    });
+
+    show('resultScreen');
+  }
+
+  $('startBtn').addEventListener('click', startQuiz);
+  $('retryBtn').addEventListener('click', () => show('startScreen'));
+</script>
+</body>
+</html>
